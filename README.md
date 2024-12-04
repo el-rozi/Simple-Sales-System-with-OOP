@@ -37,3 +37,5 @@ class Makanan(Menu):
 class Minuman(Menu):
     def __init__(self, nama, harga):
         super().__init__(nama, harga)
+
+### penjualan,py
