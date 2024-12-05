@@ -14,11 +14,11 @@ class Penjualan:
 
     def hitung_diskon(self, total):
         # Menghitung diskon berdasarkan total harga
-        if total >= 100000:
+        if total >= 1000000:
             return total * 0.035
-        elif total >= 75000:
+        elif total >= 750000:
             return total * 0.03
-        elif total >= 50000:
+        elif total >= 500000:
             return total * 0.025
         else:
             return 0
