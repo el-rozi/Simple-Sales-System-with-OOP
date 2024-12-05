@@ -7,71 +7,21 @@ def format_harga_rupiah(harga):
 
 def urutkan_menu(daftar_menu):
     """Mengatur ulang nomor urut daftar menu agar berurutan dari 1"""
-    daftar_menu_urut = {index + 1: menu for index, menu in enumerate(daftar_menu.values())}
-    return daftar_menu_urut
+    return {index + 1: menu for index, menu in enumerate(daftar_menu.values())}
 
-def main():
-    # Daftar menu awal
-    daftar_menu = {
-        1: Makanan("Nasi Goreng", 25000),
-        2: Makanan("Ayam Bakar", 30000),
-        3: Makanan("Rendang", 35000),
-        4: Makanan("Soto Ayam", 20000),
-        5: Makanan("Bakso", 15000),
-        6: Makanan("Mie Goreng", 18000),
-        7: Minuman("Es Teh", 5000),
-        8: Minuman("Kopi", 15000),
-        9: Minuman("Es Jeruk", 8000),
-        10: Minuman("Jus Alpukat", 20000),
-        11: Minuman("Jus Mangga", 25000),
-        12: Minuman("Air Mineral", 4000)
-    }
+def tampilkan_menu(daftar_menu):
+    print("\n--- Daftar Menu ---")
+    for nomor, menu in daftar_menu.items():
+        print(f"{nomor}. {menu.nama} - {format_harga_rupiah(menu.harga)}")
 
-    penjualan = Penjualan()
-
-    while True:
-        # Menampilkan menu utama
-        print("\n--- Daftar Menu ---")
-        for nomor, menu in daftar_menu.items():
-            print(f"{nomor}. {menu.nama} - {format_harga_rupiah(menu.harga)}")
-
-        print("13. Selesai dan Checkout")
-        print("14. Update Pesanan")
-        print("15. Hapus Pesanan")
-        print("16. Edit Menu")
-        print("-----------------------")
-
-        try:
-            # Input pilihan user
-            pilihan = int(input("Pilih menu (1-16): "))
-            if pilihan == 13:
-                break
-            elif pilihan == 14:
-                penjualan.update_pesanan()
-            elif pilihan == 15:
-                penjualan.hapus_pesanan()
-            elif pilihan == 16:
-                daftar_menu = edit_menu(daftar_menu)
-            elif pilihan in daftar_menu:
-                jumlah = int(input(f"Masukkan jumlah untuk {daftar_menu[pilihan].nama}: "))
-                penjualan.tambah_item(daftar_menu[pilihan], jumlah)
-            else:
-                print("Pilihan tidak valid. Silakan pilih kembali.")
-        except ValueError:
-            print("Input tidak valid. Masukkan angka.")
-
-    # Checkout
-    penjualan.checkout()
-
-def edit_menu(daftar_menu):
-    """Fungsi untuk mengedit daftar menu"""
-    print("\n--- Edit Menu ---")
+def kelola_menu(daftar_menu):
+    """Fungsi untuk mengelola daftar menu"""
+    print("\n--- Kelola Menu ---")
     print("1. Tambah Menu Baru")
     print("2. Hapus Menu")
     try:
         pilihan = int(input("Pilih opsi (1-2): "))
         if pilihan == 1:
-            # Tambah menu baru
             jenis = input("Jenis menu (Makanan/Minuman): ").strip().capitalize()
             nama = input("Masukkan nama menu baru: ").strip()
             harga = int(input("Masukkan harga menu baru: "))
@@ -83,17 +33,14 @@ def edit_menu(daftar_menu):
                 print("Jenis menu tidak valid. Pilih Makanan atau Minuman.")
                 return daftar_menu
             daftar_menu[max(daftar_menu.keys(), default=0) + 1] = menu_baru
-            print(f"Menu baru {menu_baru.nama} dengan harga {format_harga_rupiah(menu_baru.harga)} berhasil ditambahkan.")
+            print(f"Menu baru {menu_baru.nama} berhasil ditambahkan.")
         elif pilihan == 2:
-            # Hapus menu
-            print("\n--- Daftar Menu ---")
-            for nomor, menu in daftar_menu.items():
-                print(f"{nomor}. {menu.nama} - {format_harga_rupiah(menu.harga)}")
+            tampilkan_menu(daftar_menu)
             nomor_hapus = int(input("Masukkan nomor menu yang ingin dihapus: "))
             if nomor_hapus in daftar_menu:
                 menu_dihapus = daftar_menu.pop(nomor_hapus)
                 print(f"Menu {menu_dihapus.nama} berhasil dihapus.")
-                daftar_menu = urutkan_menu(daftar_menu)  # Urutkan ulang nomor menu
+                daftar_menu = urutkan_menu(daftar_menu)
             else:
                 print("Nomor menu tidak valid.")
         else:
@@ -101,6 +48,63 @@ def edit_menu(daftar_menu):
     except ValueError:
         print("Input tidak valid. Masukkan angka.")
     return daftar_menu
+
+def lakukan_pembelian(daftar_menu, penjualan):
+    while True:
+        tampilkan_menu(daftar_menu)
+        try:
+            pilihan = int(input(f"Pilih menu (1-{len(daftar_menu)} atau 0 untuk selesai): "))
+            if pilihan == 0:
+                penjualan.checkout()
+                break
+            elif pilihan in daftar_menu:
+                jumlah = int(input(f"Masukkan jumlah untuk {daftar_menu[pilihan].nama}: "))
+                penjualan.tambah_item(daftar_menu[pilihan], jumlah)
+            else:
+                print("Pilihan tidak valid.")
+        except ValueError:
+            print("Input tidak valid. Masukkan angka.")
+
+def main():
+    daftar_menu = {
+        1: Makanan("Grilled Wagyu Steak", 1000000),
+        2: Makanan("Lobster Bisque", 500000),
+        3: Makanan("Seared Duck Breast", 350000),
+        4: Makanan("Pumpkin Truffle Soup", 200000),
+        5: Makanan("Caesar Salad Deluxe", 150000),
+        6: Makanan("Truffle Mushroom Risotto", 180000),
+        7: Minuman("Blueberry Mint Fizz", 50000),
+        8: Minuman("Passionfruit Mojito", 52000),
+        9: Minuman("Fine Wines and Champagne", 800000),
+        10: Minuman("Artisan Coffee and Tea", 40000),
+        11: Minuman("Chocolate Fondant", 250000),
+        12: Minuman("Matcha Opera Cake", 400000)
+    }
+
+    penjualan = Penjualan()
+
+    while True:
+        print("\n--- Welcome To AL Black ---")
+        print("\n--- Menu Utama ---")
+        print("1. Tampilkan Menu")
+        print("2. Kelola Menu")
+        print("3. Lakukan Pembelian")
+        print("4. Keluar")
+        try:
+            pilihan = int(input("Pilih opsi (1-4): "))
+            if pilihan == 1:
+                tampilkan_menu(daftar_menu)
+            elif pilihan == 2:
+                daftar_menu = kelola_menu(daftar_menu)
+            elif pilihan == 3:
+                lakukan_pembelian(daftar_menu, penjualan)
+            elif pilihan == 4:
+                print("Terima kasih telah menggunakan aplikasi.")
+                break
+            else:
+                print("Pilihan tidak valid.")
+        except ValueError:
+            print("Input tidak valid. Masukkan angka.")
 
 # Jalankan program
 if __name__ == "__main__":
