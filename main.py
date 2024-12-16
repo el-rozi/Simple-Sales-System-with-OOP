@@ -15,39 +15,89 @@ def tampilkan_menu(daftar_menu):
         print(f"{nomor}. {menu.nama} - {format_harga_rupiah(menu.harga)}")
 
 def kelola_menu(daftar_menu):
-    """Fungsi untuk mengelola daftar menu"""
-    print("\n--- Kelola Menu ---")
-    print("1. Tambah Menu Baru")
-    print("2. Hapus Menu")
-    try:
-        pilihan = int(input("Pilih opsi (1-2): "))
-        if pilihan == 1:
-            jenis = input("Jenis menu (Makanan/Minuman): ").strip().capitalize()
-            nama = input("Masukkan nama menu baru: ").strip()
-            harga = int(input("Masukkan harga menu baru: "))
-            if jenis == "Makanan":
-                menu_baru = Makanan(nama, harga)
-            elif jenis == "Minuman":
-                menu_baru = Minuman(nama, harga)
+    """Fungsi untuk mengelola daftar menu (tambah, hapus, ubah, kembali)"""
+    while True:
+        print("\n--- Kelola Menu ---")
+        print("1. Tambah Menu Baru")
+        print("2. Hapus Menu")
+        print("3. Ubah Menu")
+        print("4. Kembali ke Menu Utama")
+        try:
+            pilihan = int(input("Pilih opsi (1-4): "))
+            if pilihan == 1:
+                # Tambah menu baru
+                jenis = input("Jenis menu (Makanan/Minuman): ").strip().capitalize()
+                nama = input("Masukkan nama menu baru: ").strip()
+                harga = int(input("Masukkan harga menu baru: "))
+                if jenis == "Makanan":
+                    menu_baru = Makanan(nama, harga)
+                elif jenis == "Minuman":
+                    menu_baru = Minuman(nama, harga)
+                else:
+                    print("Jenis menu tidak valid. Pilih Makanan atau Minuman.")
+                    continue
+                daftar_menu[max(daftar_menu.keys(), default=0) + 1] = menu_baru
+                print(f"Menu baru {menu_baru.nama} dengan harga {format_harga_rupiah(menu_baru.harga)} berhasil ditambahkan.")
+
+            elif pilihan == 2:
+                # Hapus menu
+                if not daftar_menu:
+                    print("Tidak ada menu yang tersedia untuk dihapus.")
+                    continue
+                print("\n--- Daftar Menu ---")
+                for nomor, menu in daftar_menu.items():
+                    print(f"{nomor}. {menu.nama} - {format_harga_rupiah(menu.harga)}")
+                nomor_hapus = int(input("Masukkan nomor menu yang ingin dihapus: "))
+                if nomor_hapus in daftar_menu:
+                    menu_dihapus = daftar_menu.pop(nomor_hapus)
+                    print(f"Menu {menu_dihapus.nama} berhasil dihapus.")
+                    daftar_menu = urutkan_menu(daftar_menu)  # Urutkan ulang nomor menu
+                else:
+                    print("Nomor menu tidak valid.")
+
+            elif pilihan == 3:
+                # Ubah menu
+                if not daftar_menu:
+                    print("Tidak ada menu yang tersedia untuk diubah.")
+                    continue
+                print("\n--- Daftar Menu ---")
+                for nomor, menu in daftar_menu.items():
+                    print(f"{nomor}. {menu.nama} - {format_harga_rupiah(menu.harga)}")
+                nomor_ubah = int(input("Masukkan nomor menu yang ingin diubah: "))
+                if nomor_ubah in daftar_menu:
+                    menu = daftar_menu[nomor_ubah]
+                    print(f"Menu terpilih: {menu.nama} - {format_harga_rupiah(menu.harga)}")
+                    nama_baru = input("Masukkan nama baru (kosongkan jika tidak ingin mengubah): ").strip()
+                    harga_baru = input("Masukkan harga baru (kosongkan jika tidak ingin mengubah): ").strip()
+                    if nama_baru:
+                        menu.nama = nama_baru
+                    if harga_baru:
+                        try:
+                            menu.harga = int(harga_baru)
+                        except ValueError:
+                            print("Harga baru tidak valid. Tidak ada perubahan pada harga.")
+                    print(f"Menu berhasil diubah menjadi {menu.nama} - {format_harga_rupiah(menu.harga)}.")
+                else:
+                    print("Nomor menu tidak valid.")
+
+            elif pilihan == 4:
+                # Kembali ke menu utama
+                print("Kembali ke Menu Utama.")
+                break
             else:
-                print("Jenis menu tidak valid. Pilih Makanan atau Minuman.")
-                return daftar_menu
-            daftar_menu[max(daftar_menu.keys(), default=0) + 1] = menu_baru
-            print(f"Menu baru {menu_baru.nama} berhasil ditambahkan.")
-        elif pilihan == 2:
-            tampilkan_menu(daftar_menu)
-            nomor_hapus = int(input("Masukkan nomor menu yang ingin dihapus: "))
-            if nomor_hapus in daftar_menu:
-                menu_dihapus = daftar_menu.pop(nomor_hapus)
-                print(f"Menu {menu_dihapus.nama} berhasil dihapus.")
-                daftar_menu = urutkan_menu(daftar_menu)
-            else:
-                print("Nomor menu tidak valid.")
-        else:
-            print("Pilihan tidak valid.")
-    except ValueError:
-        print("Input tidak valid. Masukkan angka.")
+                print("Pilihan tidak valid. Masukkan angka antara 1-4.")
+        except ValueError:
+            print("Input tidak valid. Masukkan angka.")
     return daftar_menu
+
+def urutkan_menu(daftar_menu):
+    """Mengatur ulang nomor urut daftar menu agar berurutan dari 1"""
+    return {index + 1: menu for index, menu in enumerate(daftar_menu.values())}
+
+def format_harga_rupiah(harga):
+    """Format harga menjadi Rupiah dengan separator ribuan (misal: Rp50.000)"""
+    return f"Rp{harga:,.0f}".replace(",", ".")
+
 
 def lakukan_pembelian(daftar_menu, penjualan):
     while True:
